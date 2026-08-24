@@ -1,0 +1,16 @@
+{
+  "name": "dev_connect",
+  "version": "1.0.0",
+  "description": "An app for developers to create connections",
+  "license": "ISC",
+  "author": "Shatayu Deshpande",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
