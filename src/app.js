@@ -22,26 +22,51 @@ const app = express();
 //   res.send("Hello from the server");
 // });
 
-app.use(
-  "/user",
-  (req, res, next) => {
-    console.log("Hello from server");
-    res.send("Received");
-    next();
-  },
-  (req, res) => {
-    // res.send("received 2");
-    next();
-  },
-  (req, res) => {
-    // res.send("received 3");
-    next();
-  },
-  (req, res) => {
-    // res.send("received 4");
-    // next() 
-  },
-);
+// handles all type of request when .use is written
+// app.use(
+//   "/user",
+//   (req, res, next) => {
+//     console.log("Hello from server");
+//     res.send("Received");
+//     next();
+//   },
+//   (req, res) => {
+//     // res.send("received 2");
+//     next();
+//   },
+//   (req, res) => {
+//     // res.send("received 3");
+//     next();
+//   },
+//   (req, res) => {
+//     // res.send("received 4");
+//     // next()
+//   },
+// );
+
+// app.get("/admin/getAllData", (req, res) => {
+//   // Logic of checking is the request is authorized or not
+//   const token = "abc";
+//   const isAdminAuthorized = token === "abc";
+//   if (isAdminAuthorized) {
+//     res.send("You're authorized, All Data sent");
+//   } else {
+//     res.status(401).send("Unauthorized user");
+//   }
+// });
+
+const adminAuth = require("./middlewares/auth");
+
+// below is the cleaner way of writing a middleware
+app.use("/admin", adminAuth);
+
+app.get("/admin/getAllData", (req, res) => {
+  res.send("All Data sent");
+});
+
+app.get("/admin/deleteUser", (req, res) => {
+  res.send("User has been deleted");
+});
 
 // listens the incoming requests.
 app.listen(4000, () => {
