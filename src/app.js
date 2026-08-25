@@ -55,20 +55,40 @@ const app = express();
 //   }
 // });
 
-const adminAuth = require("./middlewares/auth");
+// const adminAuth = require("./middlewares/auth");
 
-// below is the cleaner way of writing a middleware
-app.use("/admin", adminAuth);
+// // below is the cleaner way of writing a middleware
+// app.use("/admin", adminAuth);
 
-app.get("/admin/getAllData", (req, res) => {
-  res.send("All Data sent");
+// app.get("/admin/getAllData", (req, res) => {
+//   res.send("All Data sent");
+// });
+
+// app.get("/admin/deleteUser", (req, res) => {
+//   res.send("User has been deleted");
+// });
+
+
+// a more better way is to write inside a try catch block
+app.use("/getAll Data", (err, req, res, next) => {
+  try {
+    throw new Error("abc");
+    res.send("data sent successfully");
+  } catch (err) {
+    // res.status(500).send(err.message)
+    res.status(500).send("Some error happened, contact to the support team");
+  }
 });
 
-app.get("/admin/deleteUser", (req, res) => {
-  res.send("User has been deleted");
+// middleware example to handle errors, always keep them at the end.
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("something went wrong");
+  }
 });
 
 // listens the incoming requests.
 app.listen(4000, () => {
   console.log("Server is successfully listening on port 3000");
 });
+
