@@ -49,30 +49,33 @@ app.delete("/user", async (req, res) => {
 });
 
 // update the user by id in the database
-// app.patch("/user", async (req, res) => {
-//   const userId = req.body.userId;
-//   const data = req.body;
-
-//   try {
-//     const user = await User.findByIdAndUpdate(userId, data);
-//     res.send("User updated successfully");
-//   } catch (err) {
-//     res.status(404).send("Something went wrong");
-//   }
-// });
-
-// update the user by email in the database
 app.patch("/user", async (req, res) => {
-  const emailId = req.body.emailId;
+  const userId = req.body.userId;
   const data = req.body;
 
   try {
-    const user = await User.findOneAndUpdate({ emailId }, data);
+    const user = await User.findByIdAndUpdate(userId, data, {
+      // checks for the validations when user data is updated.
+      runValidators: true,
+    });
     res.send("User updated successfully");
   } catch (err) {
     res.status(404).send("Something went wrong");
   }
 });
+
+// update the user by email in the database
+// app.patch("/user", async (req, res) => {
+//   const emailId = req.body.emailId;
+//   const data = req.body;
+
+//   try {
+//     const user = await User.findOneAndUpdate({ emailId }, data);
+//     res.send("User updated successfully");
+//   } catch (err) {
+//     res.status(404).send("Something went wrong");
+//   }
+// });
 
 // feed api (will help to get all the users present in the collection of users)
 app.use("/feed", async (req, res) => {
