@@ -54,6 +54,24 @@ app.patch("/user", async (req, res) => {
   const data = req.body;
 
   try {
+    const ALLOWED_UPDATES = [
+      "userId",
+      "photoUrl",
+      "about",
+      "gender",
+      "age",
+      "skills",
+    ];
+
+    const isUpdateAllowed = Object.keys(data).every((key) =>
+      ALLOWED_UPDATES.includes(key),
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("User update is not allowed");
+    }
+    if (data?.skills.length > 10) {
+      throw new Error("Skills should not be more than 10");
+    }
     const user = await User.findByIdAndUpdate(userId, data, {
       // checks for the validations when user data is updated.
       runValidators: true,
