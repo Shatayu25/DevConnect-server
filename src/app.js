@@ -1,22 +1,81 @@
 const express = require("express");
-const app = express();
 const connectDB = require("./config/database");
+const cookieParser = require("cookie-parser");
+const { validateSignUp } = require("./utils/validation");
+const { userAuth } = require("./middlewares/auth");
+
+const app = express();
 const User = require("./models/user");
+const bcrypt = require("bcrypt");
 
 // will work for all the routes, as not route path is mentioned
 //  A middleware provided by express, converts json to js object
 app.use(express.json());
+// a middleware used to read to cookie
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
-  // creating a new instance of the User model
-  const user = new User(req.body);
+  // Validation of the data
+  validateSignUp(req);
 
+  const { firstName, lastName, emailId, password } = req.body;
+
+  // Encrypting the password
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  // creating a new instance of the User model
+  const user = new User({
+    firstName,
+    lastName,
+    emailId,
+    password: passwordHash,
+  });
   try {
     // saves the user in the db
     await user.save();
     res.send("User created Successfully");
   } catch (err) {
-    res.status(400).send("Error saving the user:", err.message);
+    res.status(400).send("Error saving the user:", + err.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+    const isPasswordValid = await user.validatePassword(password);
+
+    if (!isPasswordValid) {
+      // Create a JWT Token
+      // below code is written in userSchema methods to make the code cleaner.
+      // const token = await jwt.sign({ _id: user._id }, "DEV@connect$789", {
+      //   expiresIn: "1d",
+      // });
+      const token = await user.getJWT();
+
+      // Add token to the cookie and send response back to the user.
+      res.cookie("token", token);
+      res.send("User logged-in successfully");
+    } else {
+      throw new Error("Invalid credentials");
+    }
+  } catch (err) {
+    res.status(404).send("ERROR:" + err.message);
+  }
+});
+
+// before going to the route handler, the api endpoints pass through the middleware and after the required authentication the response is sent back to the client.
+app.post("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+
+    res.send(user);
+  } catch (err) {
+    res.status(404).send("ERROR: " + err.message);
   }
 });
 
@@ -83,17 +142,17 @@ app.patch("/user", async (req, res) => {
 });
 
 // update the user by email in the database
-// app.patch("/user", async (req, res) => {
-//   const emailId = req.body.emailId;
-//   const data = req.body;
+app.patch("/user", async (req, res) => {
+  const emailId = req.body.emailId;
+  const data = req.body;
 
-//   try {
-//     const user = await User.findOneAndUpdate({ emailId }, data);
-//     res.send("User updated successfully");
-//   } catch (err) {
-//     res.status(404).send("Something went wrong");
-//   }
-// });
+  try {
+    const user = await User.findOneAndUpdate({ emailId }, data);
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(404).send("Something went wrong");
+  }
+});
 
 // feed api (will help to get all the users present in the collection of users)
 app.use("/feed", async (req, res) => {
