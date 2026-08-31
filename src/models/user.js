@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
@@ -71,12 +72,12 @@ userSchema.methods.validatePassword = async function (passwordInputByUser) {
   const user = this;
   const passwordHash = user.password;
 
-  const isPasswordValid = await bcrypt.compare(
+  const passwordCheck = await bcrypt.compare(
     passwordInputByUser,
     passwordHash,
   );
 
-  return isPasswordValid;
+  return passwordCheck;
 };
 
 // creates a model based on the schema, first argument is the name of the model and second argument is the required schema.
