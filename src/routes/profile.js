@@ -27,7 +27,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
     await loggedInUser.save();
 
-    res.send({
+    res.json({
       message: `${loggedInUser.firstName}, your profile updated successfully`,
       data: loggedInUser,
     });
@@ -38,7 +38,6 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
 profileRouter.patch("/profile/edit/password", userAuth, async (req, res) => {
   try {
-
     const newPassword = req.body.password;
 
     if (!newPassword || !validator.isStrongPassword(newPassword)) {
@@ -51,7 +50,7 @@ profileRouter.patch("/profile/edit/password", userAuth, async (req, res) => {
 
     await loggedInUser.save();
 
-    res.send({
+    res.json({
       message: `${loggedInUser.firstName}, your password updated successfully`,
     });
   } catch (err) {

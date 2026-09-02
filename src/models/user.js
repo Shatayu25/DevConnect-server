@@ -36,12 +36,16 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      // custom validation
-      validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("Gender data is not valid");
-        }
+      enum: {
+        values: ["male", "female", "other"],
+        message: `{VALUE} is not supported`,
       },
+      // custom validation
+      // validate(value) {
+      //   if (!["male", "female", "others"].includes(value)) {
+      //     throw new Error("Gender data is not valid");
+      //   }
+      // },
     },
     photoUrl: {
       type: String,
@@ -72,10 +76,7 @@ userSchema.methods.validatePassword = async function (passwordInputByUser) {
   const user = this;
   const passwordHash = user.password;
 
-  const passwordCheck = await bcrypt.compare(
-    passwordInputByUser,
-    passwordHash,
-  );
+  const passwordCheck = await bcrypt.compare(passwordInputByUser, passwordHash);
 
   return passwordCheck;
 };

@@ -7,7 +7,7 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const connectDB = async () => {
   await mongoose.connect(
-    "mongodb+srv://Shatayu25:shatayu25@cluster0.yapcsfk.mongodb.net/?authSource=admin",
+    "mongodb+srv://Shatayu25:shatayu25@cluster0.yapcsfk.mongodb.net/DevConnect?authSource=admin",
   );
 };
 
