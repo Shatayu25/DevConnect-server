@@ -87,7 +87,7 @@ requestRouter.post(
         return res.status(400).json({ message: "Connection Request does not exists" });
       }
 
-      connection.status = status;
+      connectionRequest.status = status;
 
       const data = await connectionRequest.save();
       res.json({ message: "Connection Request " + status, data });
