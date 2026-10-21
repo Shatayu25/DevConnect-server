@@ -2,15 +2,13 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
-  // read the token from the req.cookies
-  // validate the token
-  // find the user
   try {
     const { token } = req.cookies;
     if (!token) {
-      throw new Error("Invalid token");
+      return res.status(401).json({ message: "Please login" });
     }
 
+    // standard way of writing, check documentation
     const decodedObj = await jwt.verify(token, "DEV@connect$789");
 
     const { _id } = decodedObj;

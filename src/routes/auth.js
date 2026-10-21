@@ -1,4 +1,5 @@
 const express = require("express");
+// way to create a Router
 const authRouter = express.Router();
 
 const { validateSignUp } = require("../utils/validation");
@@ -25,7 +26,9 @@ authRouter.post("/signup", async (req, res) => {
   try {
     // saves the user in the db
     await user.save();
-    res.send("User created Successfully");
+    res.json({
+      message: "User created Successfully",
+    });
   } catch (err) {
     res.status(400).send("Error saving the user:", +err.message);
   }
@@ -35,9 +38,10 @@ authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
 
+    // db query
     const user = await User.findOne({ emailId: emailId });
     if (!user) {
-      throw new Error("Invalid credentials");
+      return res.status(400).json({ message: "User does not exist, Please Signup to continue" });
     }
     const isPasswordValid = await user.validatePassword(password);
 
@@ -51,12 +55,14 @@ authRouter.post("/login", async (req, res) => {
 
       // Add token to the cookie and send response back to the user.
       res.cookie("token", token);
-      res.send("User logged-in successfully");
+      res.json({
+        message: "Login successful",
+      });
     } else {
-      throw new Error("Invalid credentials");
+      return res.status(400).json({ message: "Invalid Credentials" });
     }
   } catch (err) {
-    res.status(404).send("ERROR:" + err.message);
+    res.status(404).send("ERROR:", err);
   }
 });
 

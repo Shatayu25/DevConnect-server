@@ -37,8 +37,8 @@ requestRouter.post(
       }
 
       // validation for checking the user to which the request is sent exists or not
-      const toUSer = await User.findById(toUserId);
-      if (!toUSer) {
+      const toUser = await User.findById(toUserId);
+      if (!toUser) {
         res.status(404).json({
           message: "User does not exists",
         });
@@ -77,6 +77,7 @@ requestRouter.post(
         return res.status(400).json({ message: "Status not allowed" });
       }
 
+      // query to the db
       const connectionRequest = await ConnectionRequest.findOne({
         _id: requestId,
         toUserId: loggedInUser._id,
@@ -84,7 +85,9 @@ requestRouter.post(
       });
 
       if (!connectionRequest) {
-        return res.status(400).json({ message: "Connection Request does not exists" });
+        return res
+          .status(404)
+          .json({ message: "Connection Request does not exists" });
       }
 
       connectionRequest.status = status;

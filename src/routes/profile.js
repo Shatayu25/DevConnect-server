@@ -9,7 +9,9 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     const user = req.user;
 
-    res.send(user);
+    res.json({
+      data: user,
+    });
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
@@ -17,6 +19,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
+    // data sanitization, data validation
     if (!validateEditProfileData(req)) {
       throw new Error("Invalid Edit Request");
     }
