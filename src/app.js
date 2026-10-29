@@ -10,7 +10,7 @@ const requestRouter = require("./routes/requests");
 const userRouter = require("./routes/user");
 
 app.use(
-  // options object was passed below to whitelist our frontend url 
+  // options object was passed below to whitelist our frontend url
   cors({
     origin: "http://localhost:5173",
     credentials: true,
@@ -19,6 +19,7 @@ app.use(
 
 // Middlewares
 app.use(express.json());
+app.use("/uploads", express.static("src/uploads"));
 app.use(cookieParser());
 
 app.use("/", authRouter);

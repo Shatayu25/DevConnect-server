@@ -1,9 +1,11 @@
 const express = require("express");
 const profileRouter = express.Router();
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 
 const { userAuth } = require("../middlewares/auth");
 const { validateEditProfileData } = require("../utils/validation");
+const upload = require("../middlewares/multerConfig");
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
@@ -17,27 +19,41 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
   }
 });
 
-profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
-  try {
-    // data sanitization, data validation
-    if (!validateEditProfileData(req)) {
-      throw new Error("Invalid Edit Request");
+profileRouter.patch(
+  "/profile/edit",
+  userAuth,
+  upload.single("photoUrl"),
+  async (req, res) => {
+    try {
+      // data sanitization, data validation
+      if (!validateEditProfileData(req)) {
+        throw new Error("Invalid Edit Request");
+      }
+
+      const loggedInUser = req.user;
+
+      if (req.file) {
+        const fileName = req.file.filename;
+        const fileStr = `/uploads/${fileName}`;
+
+        loggedInUser.photoUrl = fileStr;
+      }
+
+      Object.keys(req.body).forEach(
+        (key) => (loggedInUser[key] = req.body[key]),
+      );
+
+      await loggedInUser.save();
+
+      res.json({
+        message: `${loggedInUser.firstName}, your profile updated successfully`,
+        data: loggedInUser,
+      });
+    } catch (err) {
+      res.status(404).send("ERROR:" + err.message);
     }
-
-    const loggedInUser = req.user;
-
-    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
-
-    await loggedInUser.save();
-
-    res.json({
-      message: `${loggedInUser.firstName}, your profile updated successfully`,
-      data: loggedInUser,
-    });
-  } catch (err) {
-    res.status(404).send("ERROR:" + err.message);
-  }
-});
+  },
+);
 
 profileRouter.patch("/profile/edit/password", userAuth, async (req, res) => {
   try {
@@ -47,9 +63,11 @@ profileRouter.patch("/profile/edit/password", userAuth, async (req, res) => {
       throw new Error("Please enter a valid, strong password");
     }
 
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
     const loggedInUser = req.user;
 
-    loggedInUser.password = newPassword;
+    loggedInUser.password = hashedNewPassword;
 
     await loggedInUser.save();
 
