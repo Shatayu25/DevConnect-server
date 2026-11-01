@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
 userSchema.methods.getJWT = async function () {
   // points to the instance of the user created when logged-in, hence this is used here
   const user = this;
-  const token = await jwt.sign({ _id: user._id }, "DEV@connect$789", {
+  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 

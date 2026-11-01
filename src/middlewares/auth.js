@@ -9,7 +9,7 @@ const userAuth = async (req, res, next) => {
     }
 
     // standard way of writing, check documentation
-    const decodedObj = await jwt.verify(token, "DEV@connect$789");
+    const decodedObj = await jwt.verify(token, process.env.JWT_SECRET);
 
     const { _id } = decodedObj;
 
