@@ -29,12 +29,14 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
+const PORT = process.env.PORT || 4000;
+
 // db connection
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
-    app.listen(4000, () => {
-      console.log("Server is successfully listening on port 4000");
+    app.listen(PORT, () => {
+      console.log(`Server is successfully listening on port ${PORT}`);
     });
   })
   .catch((err) => {
