@@ -6,6 +6,7 @@ const { validateSignUp } = require("../utils/validation");
 
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const { none } = require("../middlewares/multerConfig");
 
 authRouter.post("/signup", async (req, res) => {
   // Validation of the data
@@ -41,7 +42,9 @@ authRouter.post("/login", async (req, res) => {
     // db query
     const user = await User.findOne({ emailId: emailId });
     if (!user) {
-      return res.status(400).json({ message: "User does not exist, Please Signup to continue" });
+      return res
+        .status(400)
+        .json({ message: "User does not exist, Please Signup to continue" });
     }
     const isPasswordValid = await user.validatePassword(password);
 
@@ -54,7 +57,12 @@ authRouter.post("/login", async (req, res) => {
       const token = await user.getJWT();
 
       // Add token to the cookie and send response back to the user.
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        // to solve default cross-origin cookie blocking error
+        httpOnly: true,
+        secure: true,
+        sameSite: none,
+      });
       res.json({
         message: "Login successful",
       });
