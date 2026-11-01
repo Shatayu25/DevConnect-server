@@ -61,7 +61,7 @@ authRouter.post("/login", async (req, res) => {
         // to solve default cross-origin cookie blocking error
         httpOnly: true,
         secure: true,
-        sameSite: none,
+        sameSite: "none",
       });
       res.json({
         message: "Login successful",
