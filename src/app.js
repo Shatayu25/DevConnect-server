@@ -14,7 +14,7 @@ const userRouter = require("./routes/user");
 app.use(
   // options object was passed below to whitelist our frontend url
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://dev-connect-sd.vercel.app"],
     credentials: true,
   }),
 );
