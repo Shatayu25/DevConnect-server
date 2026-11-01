@@ -6,7 +6,7 @@ const User = require("../models/user");
 const { connection } = require("mongoose");
 
 requestRouter.post(
-  "/request/send/:status/:toUserId",
+  "/request/send/:toUserId/:status",
   userAuth,
   async (req, res) => {
     try {
@@ -54,7 +54,6 @@ requestRouter.post(
 
       res.json({
         message: "Connection Request sent successfully",
-        data,
       });
     } catch (err) {
       res.status(404).send("ERROR:" + err.message);
@@ -63,7 +62,7 @@ requestRouter.post(
 );
 
 requestRouter.post(
-  "/request/review/:status/:requestId",
+  "/request/review/:requestId/:status",
   userAuth,
   async (req, res) => {
     try {

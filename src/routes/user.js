@@ -5,7 +5,7 @@ const userRouter = express.Router();
 
 const { userAuth } = require("../middlewares/auth");
 
-const USER_SAFE_DATA = "firstName lastName age about skills";
+const USER_SAFE_DATA = "firstName lastName age about skills gender photoUrl";
 
 // get all the pending requests for the loggedIn user
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
@@ -43,10 +43,17 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
       .populate("toUserId", USER_SAFE_DATA);
 
     const data = connectionRequests.map((row) => {
+      let connectedUser;
       if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
-        return row.toUserId;
+        connectedUser = row.toUserId;
+      } else {
+        connectedUser = row.fromUserId;
       }
-      return row.fromUserId;
+
+      return {
+        ...connectedUser.toObject(),
+        connectionId: row._id,
+      };
     });
 
     res.json({
@@ -91,6 +98,32 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
     res.json({ data: users });
   } catch (err) {
     res.status(404).send("ERROR:" + err.message);
+  }
+});
+
+userRouter.delete("/user/connection/:id/remove", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const id = req.params.id;
+
+    // validation check for authenticated user
+    const deletedConnection = await ConnectionRequest.findOneAndDelete({
+      _id: id,
+      $or: [{ toUserId: loggedInUser._id }, { fromUserId: loggedInUser._id }],
+    });
+
+    if (!deletedConnection) {
+      return res.status(404).json({
+        message:
+          "Connection not found or you don't have permission to remove it",
+      });
+    }
+
+    res.json({
+      message: "Connection removed successfully",
+    });
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
   }
 });
 
