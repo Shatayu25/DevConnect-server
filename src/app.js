@@ -24,6 +24,11 @@ app.use(express.json());
 app.use("/uploads", express.static("src/uploads"));
 app.use(cookieParser());
 
+
+app.get("/", (req, res) => {
+  res.status(200).send("Server is up and running");
+})
+
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
